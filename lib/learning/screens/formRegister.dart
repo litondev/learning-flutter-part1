@@ -79,8 +79,8 @@ class RegisterScreenState extends State<RegisterScreen> with Validation{
     return RaisedButton(
       color : Colors.blue[900],
       onPressed: () {
-        // formKey.currentState! => Memaksa mengubah type data currentState sesuai dengan yang dibutuhkan 
-        
+        // (formKey.currentState as String).validate() => sama seperti di bawah 
+        // (formKey.currentState!.validate()) => Memaksa mengubah type data currentState sesuai dengan yang dibutuhkan 
         if (formKey.currentState!.validate()) { //JIKA TRUE
           formKey.currentState?.save(); //MAKA FUN
 
