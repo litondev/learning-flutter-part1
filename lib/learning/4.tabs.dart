@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import "./imports/home.dart";
-import "./imports/news.dart";
-import "./imports/popular.dart";
+import "./screens/home.dart";
+import "./screens/news.dart";
+import "./screens/popular.dart";
 
 class MyApp extends StatefulWidget{
   @override 
