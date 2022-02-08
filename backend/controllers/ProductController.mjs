@@ -18,7 +18,7 @@ export const ProductIndex = async (req, res) => {
             order: [
                 [req.query.order || 'id', (req.query.ordering === 'asc' ? 'asc' : 'desc')],
             ],
-            attributes : ['id','title','stock','price'],
+            attributes : ['id','title','stock','price','description'],
             limit : req.query.per_page || 10
        };
 

@@ -44,6 +44,6 @@ app.use('/auth',AuthRoute);
 app.use('/product',ProductRoute);
 app.use('/user',UserRoute);
 
-app.listen(process.env.PORT || 3001,() => {
+app.listen(process.env.PORT || 3001,process.env.HOST || 'localhost',() => {
     console.log("Service App Is Running in port 3001");
 });
