@@ -1,5 +1,4 @@
 import 'dotenv/config' 
-import "./configs/database.mjs"
 
 import express from "express"
 
@@ -22,8 +21,8 @@ winston.loggers.add("dev",{
 });
 
 // import ProductRoute from "./routes/product.mjs";
-// import AuthRoute from "./routes/auth.mjs";
-// import UserRoute from "./routes/user.mjs";
+import AuthRoute from "./routes/auth.mjs";
+import UserRoute from "./routes/user.mjs";
 
 // const parsingMultipartForm = multer();
 
@@ -41,9 +40,9 @@ app.get('/', (req, res) => {
     });
 });
 
-// app.use('/auth',AuthRoute);
+app.use('/auth',AuthRoute);
 // app.use('/product',ProductRoute);
-// app.use('/user',UserRoute);
+app.use('/user',UserRoute);
 
 app.listen(process.env.PORT || 3001,() => {
     console.log("Service App Is Running in port 3001");

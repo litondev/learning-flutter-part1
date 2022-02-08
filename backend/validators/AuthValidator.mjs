@@ -1,5 +1,5 @@
 import { check,validationResult } from "express-validator";
-import UserModel from "../models/User.mjs";
+import UserModel from "../models/user.js";
 
 export const ValidateSignin = (req) => {
 	return (async (req) => {
@@ -66,7 +66,10 @@ export const ValidateSignup = (req) => {
 
 			.custom(value => {
 				return UserModel.findOne({				
-					email : value					
+					where : {
+						email : value		
+					},
+					attributes : ['id'],    			
 				})				
 				.then(user => {
 					if(user){

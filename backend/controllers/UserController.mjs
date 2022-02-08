@@ -1,5 +1,7 @@
+import { Sequelize } from "sequelize";
+
 // import models
-import UserModel from "../models/User.mjs";
+import UserModel from "../models/user.js";
 
 // import helpers
 import FormatResponse from "../helpers/FormatResponse.mjs";
@@ -15,45 +17,34 @@ import fs from "fs";
 // function get All Users
 export const UserIndex = async (req, res) => {
     try {
-       let filter = {};
+       let filter = {
+            order: [
+                [req.query.order || 'id', (req.query.ordering === 'asc' ? 'asc' : 'desc')],
+            ],
+            attributes : ['id','username','email'],
+            limit : req.query.per_page || 10
+       };
 
        if(req.query.search){
-            filter = {
-                $and : [{
-                    $or : [
-                        {
-                            username : {
-                                $regex : ".*" + req.query.search + ".*",
-                            },                                          
-                        },
-                        {
-                            email : {
-                                $regex : ".*" + req.query.search + ".*"
-                            }                                          
-                        }
-                    ]
-                }]           
+            filter.where = {            
+                    [Sequelize.Op.and] : [{
+                        [Sequelize.Op.or] : [
+                            {
+                                username : {
+                                    [Sequelize.Op.regexp] : ".*" + req.query.search + ".*",
+                                },                                          
+                            },
+                            {
+                                email : {
+                                    [Sequelize.Op.regexp] : ".*" + req.query.search + ".*"
+                                }                                          
+                            }
+                        ]
+                    }]                           
             }
        }
 
-       const users = await UserModel
-        .find(filter)
-        .limit(req.query.per_page || 5)
-        .sort({
-            [req.query.order || 'createdAt'] : (req.query.ordering === 'asc' ? 1 : -1)
-        })
-        .select({
-            _id : 1,
-            username : 1,            
-            email : 1,
-            photo : 1,
-            contacts : 1,
-            areas : 1,
-            identity : {
-                card : 1
-            },
-            createdAt : 1
-        });
+       const users = await UserModel.findAll(filter)   
 
        return res.json(users);
     } catch (error) {       
@@ -66,19 +57,12 @@ export const UserShow = async (req, res) => {
     try {
 
         const user = await UserModel
-            .findById(req.params.id)
-            .select({
-                _id : 1,
-                username : 1,
-                email : 1,
-                photo : 1,
-                contacts : 1,
-                areas : 1,
-                identity : {
-                    card : 1
+            .findOne({
+                where : {
+                    id: req.params.id
                 },
-                createdAt : 1
-            });
+                attributes : ['id','email','photo','username'],    
+            })            
 
         if(!user){
             return res.status(401).json({
@@ -104,8 +88,6 @@ export const UserCreate = async (req, res) => {
             });
         }    
         
-        console.log(req.body);
-
         let payload = req.body;
 
         if(req.file){
@@ -114,7 +96,7 @@ export const UserCreate = async (req, res) => {
 
         payload["password"] = BcryptHash(payload["password"]);
 
-        await new UserModel(payload).save()    
+        await UserModel.create(payload);
 
         return res.json({
             "message" : true
@@ -134,13 +116,14 @@ export const UserUpdate = async (req, res) => {
                 "message" : isNotValid.msg
             });
         }    
-
+        
         const user = await UserModel          
-            .findById(req.params.id)
-            .select({
-                _id : 1,     
-                photo : 1       
-            });
+            .findOne({
+                where : {
+                    id : req.params.id
+                },
+                attributes : ['id','photo']
+            });    
 
         if(!user) {            
             return res.status(404).json({
@@ -148,26 +131,24 @@ export const UserUpdate = async (req, res) => {
             })
         }
                 
-        console.log(req.body);
-
         let payload = req.body;
 
         if(req.file){                        
             req.body["photo"] = req.file.filename;             
 
-            if(user.photo){
+            if(user.photo && user.photo != "default.png"){
                 fs.unlinkSync("./assets/users/"+user.photo);
             }
         }
 
         if(payload["password"]){
             payload["password"] = BcryptHash(payload["password"]);
-        }
+        }    
 
-        await UserModel.updateOne({
-            _id: req.params.id
-        }, {
-            $set: payload
+        await UserModel.update(payload, {
+            where: {
+              id: req.params.id
+            }
         });
     
         return res.json({
@@ -182,11 +163,12 @@ export const UserUpdate = async (req, res) => {
 export const UserDestroy = async (req, res) => {
     try {        
         const user = await UserModel           
-            .findById(req.params.id)
-            .select({
-                _id : 1,            
-                photo : 1
-            });
+            .findOne({
+                where : {
+                    id : req.params.id
+                },  
+                attributes : ['id','photo']
+            });    
 
         if(!user) {            
             return res.status(404).json({
@@ -194,12 +176,14 @@ export const UserDestroy = async (req, res) => {
             });
         }
     
-        if(user.photo){
+        if(user.photo && user.photo != "default.png"){
             fs.unlinkSync("./assets/users/"+user.photo);
         }
 
-        await UserModel.deleteOne({
-            _id: req.params.id
+        await UserModel.destroy({
+            where : {
+                id: req.params.id
+            }
         });
     
         return res.json({

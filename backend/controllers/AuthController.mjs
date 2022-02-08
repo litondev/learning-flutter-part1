@@ -1,5 +1,6 @@
+
 import jwt from 'jsonwebtoken';
-import UserModel from "../models/User.mjs";
+import UserModel from "../models/user.js";
 
 import {ValidateSignin,ValidateSignup} from "../validators/AuthValidator.mjs";
 import {BcryptCheck,BcryptHash} from "../helpers/Bcrypt.mjs";
@@ -14,14 +15,14 @@ export const AuthSignin = async (req, res) => {
             return res.status(422).json({
                 "message" : isNotValid.msg
             });
-        }    
-
+        }   
+    
         let user = await UserModel.findOne({
-        	email : req.body.email
-        }).select({
-        	_id : 1,
-        	password : 1        	
-        })
+            where : {
+                email : req.body.email
+            },
+            attributes : ['id','email','password','photo','username'],    
+        });
 
         if(!user){
         	return res.status(500).json({
@@ -62,7 +63,7 @@ export const AuthSignup = async (req, res) => {
 
         payload["password"] = BcryptHash(payload["password"]);
 
-        await new UserModel(payload).save()    
+        await UserModel.create(payload);
 
         return res.json({
             "message" : true
@@ -75,14 +76,12 @@ export const AuthSignup = async (req, res) => {
 export const AuthMe = async(req,res) => {
 	try{
 	   let user = await UserModel
-        .findById(req.jwt_sub)
-        .select({
-            username : 1,
-            email : 1,
-            identity: {
-                card : 1
-            }
-        });
+        .findOne({
+            where : {
+                id : req.jwt_sub
+            },
+            attributes : ['id','email','photo','username'],    
+        });        
     
        if(!user){
             return res.status(401).json({
