@@ -9,8 +9,6 @@ import {
     ProductCreate, 
     ProductUpdate,
     ProductDestroy,
-
-    ProductElastic
 } from "../controllers/ProductController.mjs";
  
     // express router
@@ -19,9 +17,6 @@ const ProductRoute = express.Router();
 
 // Route get All Products
 ProductRoute.get('/', ProductIndex);
-
-// Route Product Elastic
-ProductRoute.get("/elastic",ProductElastic);
 
 // Route get single Product
 ProductRoute.get('/:id', ProductShow);

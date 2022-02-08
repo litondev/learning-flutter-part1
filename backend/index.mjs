@@ -20,7 +20,7 @@ winston.loggers.add("dev",{
 	]
 });
 
-// import ProductRoute from "./routes/product.mjs";
+import ProductRoute from "./routes/product.mjs";
 import AuthRoute from "./routes/auth.mjs";
 import UserRoute from "./routes/user.mjs";
 
@@ -41,7 +41,7 @@ app.get('/', (req, res) => {
 });
 
 app.use('/auth',AuthRoute);
-// app.use('/product',ProductRoute);
+app.use('/product',ProductRoute);
 app.use('/user',UserRoute);
 
 app.listen(process.env.PORT || 3001,() => {
