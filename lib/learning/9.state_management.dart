@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:myfirstapp/learning/pages/add_new_product.dart';
+import 'package:myfirstapp/learning/pages/master_product_page.dart';
 import 'package:provider/provider.dart';
 
 import './pages/product_page.dart';
+import './pages/add_new_product.dart';
+import './pages/master_product_page.dart';
 import './providers/products.dart';
 
 class MyApp extends StatelessWidget{
@@ -19,7 +23,9 @@ class MyApp extends StatelessWidget{
           accentColor: Colors.yellow
         ),
         routes : {
-          '/' : (ctx) => ProductPage()
+          '/' : (ctx) => ProductPage(),
+          '/manage-product' : (ctx) => MasterProductPage(),
+          '/add-product' : (ctx) => AddNewProduct()
         }
       )
     );

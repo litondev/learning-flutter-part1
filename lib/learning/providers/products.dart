@@ -49,4 +49,78 @@ class Products with ChangeNotifier {
 
     notifyListeners();
   }
+
+  Future<ProductItem> findById(String id) async {
+    final url = "";
+    final response = await http.get(url);
+    final convert = json.decode(response.body);
+    return ProductItem(
+      id: convert['id'], 
+      title: convert['title'], 
+      stock: convert['stock'], 
+      description: convert['description']
+    );
+  } 
+
+  Future<void> addProduct(ProductItem product) async {
+    const url = "";
+    final response = await http.post(url,
+      body : json.encode({
+        "title"  : product.title,
+        "stock" : product.stock,
+        "description" : product.description
+      })
+    );
+    
+    _items.add(
+      ProductItem(
+        id : json.decode(response.body)['name'],
+        title : product.title, 
+        stock : product.stock,
+        description: product.description
+      )
+    );
+
+    notifyListeners();
+  }
+
+  Future<void> changeStock(String id) async {
+    final url = "";
+    final index = _items.indexWhere((prod) => prod.id == id);
+    final stock = _items[index].stock - 1;
+
+    await http.patch(url,body: json.encode({
+      'stock' : stock
+    }));
+
+    _items[index] = ProductItem(
+      id: id, 
+      title: _items[index].title, 
+      stock: stock, 
+      description: _items[index].description
+    );
+    
+    notifyListeners();
+  }
+
+  Future<void> updateProduct(ProductItem product) async {
+    final url = "";
+
+    await http.patch(url,body : json.encode({
+      "title" : product.title,
+      "stock" : product.stock,
+      "description" : product.description
+    }));
+
+    final index = _items.indexWhere((prod) => prod.id == product.id);
+    _items[index] = product;
+    notifyListeners();
+  }
+
+  Future<void> removeProduct(String id) async {
+    final url = "";
+    await http.delete(url);
+    _items.removeWhere((prod) => prod.id == id);
+    notifyListeners();
+  }
 }
