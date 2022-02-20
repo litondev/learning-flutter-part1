@@ -3,7 +3,7 @@ import 'package:flutter/foundation.dart';
 class Cart {
   String? id;
   String? title;
-  double? harga;
+  int? harga;
   int? qty;
 
   Cart({

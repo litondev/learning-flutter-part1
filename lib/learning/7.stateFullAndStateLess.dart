@@ -35,7 +35,7 @@ class _HomeState extends State<Home> {
     });
   }
 
-  void _addNewItem(String title,double harga,int qty){
+  void _addNewItem(String title,int harga,int qty){
     final newItem = Cart(
         id: DateTime.now().toString(),
         title: title,

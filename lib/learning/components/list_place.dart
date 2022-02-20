@@ -19,7 +19,7 @@ class ListPlace extends StatelessWidget{
       child : ListTile(
         leading: Image.network(image.toString()),
         title: Text(name.toString()),
-        subtitle: Text(description.toString().substring(0,100) + "..."),
+        subtitle: Text(description.toString().substring(0,description.toString().length - 1) + "..."),
         onTap : () => goToDetail(context)
       )
     );

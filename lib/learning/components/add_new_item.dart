@@ -24,7 +24,7 @@ class _AddNewItemState extends State<AddNewItem> {
       return;
     }
   
-    widget.addNew!(title,double.parse(harga),qty);
+    widget.addNew!(title,int.parse(harga),qty);
     
     Navigator.of(context).pop();    
   }
