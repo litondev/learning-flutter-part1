@@ -9,6 +9,8 @@ import FormatResponse from "../helpers/FormatResponse.mjs";
 // import validators
 import {ValidateProduct} from "../validators/ProductValidator.mjs";
 
+import {ValidateProductStock} from "../validators/ProductStockValidator.mjs";
+
 import fs from "fs";
 
 // function get All Products
@@ -82,9 +84,10 @@ export const ProductCreate = async (req, res) => {
             req.body.photo = req.file.filename; 
         }
     
-        await ProductModel.create(req.body)
+        let product = await ProductModel.create(req.body)
 
         return res.json({
+            ...product,
             "message" : true
         });
     } catch (error) {    
@@ -170,6 +173,45 @@ export const ProductDestroy = async (req, res) => {
             message : true
         });
     } catch (error) {    
+        return FormatResponse.Failed(error,res);
+    }
+}
+
+// function Update Stock Product 
+export const ProductUpdateStock = async(req,res)  => {
+    try {
+        let isNotValid = await ValidateProductStock(req);
+
+        if(isNotValid){
+            return res.status(422).json({
+                "message" : isNotValid.msg
+            });
+        }    
+
+        const product = await ProductModel          
+            .findOne({
+                where : {
+                    id : req.params.id
+                },  
+                attributes : ['id']
+            });  
+
+        if(!product) {            
+            return res.status(404).json({
+                message : "Not Found"
+            })
+        }
+
+        await ProductModel.update(req.body,{
+            where: {
+              id: req.params.id
+            }
+        });
+
+        return res.json({
+            message : true
+        });
+    } catch (error) {        
         return FormatResponse.Failed(error,res);
     }
 }

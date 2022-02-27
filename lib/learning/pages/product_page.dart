@@ -43,8 +43,9 @@ class ProductPage extends StatelessWidget {
                       itemBuilder: (ctx,i) => ProductList(
                         product.items[i].id,
                         product.items[i].title,
-                        product.items[i].description,
+                        product.items[i].description,                        
                         product.items[i].stock,
+                        product.items[i].price,
                         false
                       )
                     )

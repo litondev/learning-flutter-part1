@@ -52,6 +52,7 @@ class MasterProductPage extends StatelessWidget {
                         product.items[i].title,
                         product.items[i].description,
                         product.items[i].stock,
+                        product.items[i].price,
                         true
                       ),
                     ),

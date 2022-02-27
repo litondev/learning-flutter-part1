@@ -9,14 +9,16 @@ class AddNewProduct extends StatefulWidget{
 
 class _AddNewProductState extends State<AddNewProduct>{
   final _titleDispose = FocusNode();
-  final _priceDispose = FocusNode();
+  final _stockDispose = FocusNode();
+  final _priceDispose = FocusNode();  
   final _descriptionDispose = FocusNode();
 
   final _titleController = TextEditingController();
   final _stockController = TextEditingController();
+  final _priceController = TextEditingController();
   final _descriptionController = TextEditingController();
 
-  final form  = GlobalKey<FormState>();
+  final _form  = GlobalKey<FormState>();
   var _isLoading = false;
   var _initValue = false;
   String? id;
@@ -32,9 +34,10 @@ class _AddNewProductState extends State<AddNewProduct>{
 
       if(id != null){
         final response = await Provider.of<Products>(context).findById(id);
-        _titleController.text = response.title;
+        _titleController.text = response.title as String;
         _stockController.text = response.stock.toString();
-        _descriptionController.text = response.description;
+        _priceController.text = response.price.toString();
+        _descriptionController.text = response.description as  String;
       }
 
       setState(() {
@@ -50,18 +53,23 @@ class _AddNewProductState extends State<AddNewProduct>{
   void dispose(){
     _titleDispose.dispose();
     _priceDispose.dispose();
+    _stockDispose.dispose();
     _descriptionDispose.dispose();
     super.dispose();
   }
 
   Future<void> _submit() async {
-      final isValid = _form.currentState.validate();
+      final isValid = _form.currentState?.validate();
+
+      if(isValid == null){
+        return;
+      } 
 
       if(!isValid){
         return;
       }
 
-      _form.currentState.save();
+      _form.currentState?.save();
 
       setState(() {
         _isLoading = true;
@@ -73,6 +81,7 @@ class _AddNewProductState extends State<AddNewProduct>{
             id : null,
             title : _titleController.text,
             stock : int.parse(_stockController.text),
+            price : int.parse(_priceController.text),
             description : _descriptionController.text 
           ));
       }else{
@@ -81,6 +90,7 @@ class _AddNewProductState extends State<AddNewProduct>{
             id : null,
             title : _titleController.text,
             stock : int.parse(_stockController.text),
+            price: int.parse(_priceController.text),
             description:  _descriptionController.text
           ));
       }
@@ -118,7 +128,7 @@ class _AddNewProductState extends State<AddNewProduct>{
                     decoration: InputDecoration(labelText: 'Nama Barang'),
                     textInputAction: TextInputAction.next,
                     onFieldSubmitted: (_){
-                      FocusScope.of(context).requestFocus(_priceDispose);
+                      FocusScope.of(context).requestFocus(_stockDispose);
                     },
                     validator: (value){
                       if(value == null){
@@ -137,7 +147,7 @@ class _AddNewProductState extends State<AddNewProduct>{
                     textInputAction: TextInputAction.next,
                     keyboardType: TextInputType.number,
                     onFieldSubmitted: (_){
-                      FocusScope.of(context).requestFocus(_descriptionDispose)
+                      FocusScope.of(context).requestFocus(_priceDispose);
                     },
                     validator: (value){
                       if(value == null){
@@ -155,6 +165,30 @@ class _AddNewProductState extends State<AddNewProduct>{
                       return null;
                     },
                     controller: _stockController,
+                  ),
+                  TextFormField( 
+                    decoration: InputDecoration(labelText: "Price Barang"),
+                    textInputAction:   TextInputAction.next,
+                    keyboardType:  TextInputType.number,
+                    onFieldSubmitted: (_){
+                      FocusScope.of(context).requestFocus(_descriptionDispose);
+                    },
+                    validator: (value){
+                      if(value == null){
+                        return "Price Kosong";
+                      }
+
+                      if(value.toString().isEmpty){
+                        return "Price Kosong";
+                      }
+
+                      if(int.parse(value) <= 0){
+                        return "Stock Kosong";
+                      }
+                      return null;
+                    },
+                    controller: _priceController,
+
                   ),
                   TextFormField(
                     maxLines: 3,

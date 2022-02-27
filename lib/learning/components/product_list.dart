@@ -7,9 +7,10 @@ class ProductList extends StatelessWidget {
   String? title;
   String? description;
   int? stock;
+  int? price;
   bool? type;
 
-  ProductList(this.id,this.title,this.description,this.stock,this.type);
+  ProductList(this.id,this.title,this.description,this.stock,this.price,this.type);
 
   @override 
   Widget build(BuildContext context){
@@ -56,7 +57,7 @@ class ProductList extends StatelessWidget {
         ).then((result) {
           if(result){        
               if((stock as int) > 0){
-                Provider.of<Products>(context,listen: false).changeStock(id);
+                Provider.of<Products>(context,listen: false).changeStock(id as String);
               }else{
                 Scaffold.of(context).hideCurrentSnackBar();
                 Scaffold.of(context).showSnackBar(SnackBar(
@@ -115,7 +116,7 @@ class ProductList extends StatelessWidget {
                             TextButton(
                               onPressed: (){
                                 Provider.of<Products>(context,listen: false)
-                                .removeProduct(id)
+                                .removeProduct(id as String)
                                 .then((_) {
                                   Navigator.of(context).pop(false);
                                 });
