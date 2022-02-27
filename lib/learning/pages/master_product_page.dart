@@ -34,7 +34,7 @@ class MasterProductPage extends StatelessWidget {
             return Center(
               child: CircularProgressIndicator(),
             );
-          }else{
+          }else{            
             if(snapshot.error != null){
               return Center(
                 child : Text("Error Loading Data")

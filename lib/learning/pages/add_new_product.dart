@@ -25,25 +25,32 @@ class _AddNewProductState extends State<AddNewProduct>{
 
   @override 
   void didChangeDependencies() async {
-    if(_initValue){
-      setState(() {
-        _isLoading = true;
-      });
+      print("add/edit");
 
-      String? id = ModalRoute.of(context)?.settings.arguments as String;
+    // if(_initValue){
+      if (mounted) {
+        setState(() {
+          _isLoading = true;
+        });
+      }
 
+      id = ModalRoute.of(context)?.settings.arguments as String;
+      
       if(id != null){
-        final response = await Provider.of<Products>(context).findById(id);
+        print(id);
+        final response = await Provider.of<Products>(context).findById(id as String);
         _titleController.text = response.title as String;
         _stockController.text = response.stock.toString();
         _priceController.text = response.price.toString();
         _descriptionController.text = response.description as  String;
       }
 
-      setState(() {
-        _isLoading = false;
-      });
-    }
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    // }
 
     _initValue = false;
     super.didChangeDependencies();
@@ -71,11 +78,14 @@ class _AddNewProductState extends State<AddNewProduct>{
 
       _form.currentState?.save();
 
-      setState(() {
-        _isLoading = true;
-      });
+      if (mounted) {
+        setState(() {
+          _isLoading = true;
+        });
+      }
 
       if(id == null){
+        print("Send Add");
         await Provider.of<Products>(context,listen : false)
           .addProduct(ProductItem(
             id : null,
@@ -85,9 +95,10 @@ class _AddNewProductState extends State<AddNewProduct>{
             description : _descriptionController.text 
           ));
       }else{
+        print("send Edit");
         await Provider.of<Products>(context,listen: false)
           .updateProduct(ProductItem(
-            id : null,
+            id : id,
             title : _titleController.text,
             stock : int.parse(_stockController.text),
             price: int.parse(_priceController.text),
@@ -95,9 +106,12 @@ class _AddNewProductState extends State<AddNewProduct>{
           ));
       }
 
-      setState((){
-        _isLoading = false;
-      });
+
+      if (mounted) {
+        setState((){
+          _isLoading = false;
+        });
+      }
 
       Navigator.of(context).pop();
   }

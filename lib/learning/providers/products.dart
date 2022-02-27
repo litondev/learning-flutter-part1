@@ -24,36 +24,36 @@ class Products with ChangeNotifier {
 
   List<ProductItem> get items {
     return [
-      ...items
+      ..._items
     ];
   }
 
   Future<void> fetchProduct() async {
     final url = Uri.parse((dotenv.env['API_URL'] as String) + "/product");
-
+    
     final response = await http.get(url,
       headers : {
         'accept' : 'application/json'
       }
     );
 
-    final convertData = json.decode(response.body) as Map<String,dynamic>;
+    final convertData = json.decode(response.body) as List<dynamic>;
 
     final List<ProductItem> newData = [];
 
     if(convertData == null) return;
 
-    convertData.forEach((key, value) {
+    convertData.forEach((element) {
       newData.add(
-        ProductItem(
-          id : value['id'],
-          title: value['title'],
-          stock : value['stock'],
-          price : value["price"],
-          description:  value['description']
+         ProductItem(
+          id : element['id'].toString(),
+          title: element['title'],
+          stock : element['stock'],
+          price : element["price"],
+          description:  element['description']
         )
       );
-    }); 
+    });  
 
     _items = newData;
 
@@ -72,22 +72,22 @@ class Products with ChangeNotifier {
     final convert = json.decode(response.body);
 
     return ProductItem(
-      id: convert['id'], 
+      id: convert['id'].toString(), 
       title: convert['title'], 
       stock: convert['stock'], 
       price : convert["price"],
-      description: convert['description']
+      description: convert['description'] == null ? '-' : convert["description"]
     );
   } 
 
   Future<void> addProduct(ProductItem product) async {
     final url = Uri.parse((dotenv.env['API_URL'] as String) + "/product");
-
+    
     final response = await http.post(url,
-      headers : {
-        "accept" : "application/json"
+      headers: <String, String>{
+        "Content-Type": "application/json"
       },
-      body : json.encode({
+      body : jsonEncode(<String, dynamic>{
         "title"  : product.title,
         "stock" : product.stock,
         "price" : product.price,
@@ -97,7 +97,7 @@ class Products with ChangeNotifier {
     
     _items.add(
       ProductItem(
-        id : json.decode(response.body)['id'],
+        id : json.decode(response.body)["dataValues"]["id"].toString(),
         title : product.title, 
         stock : product.stock,
         price : product.price,
@@ -109,17 +109,22 @@ class Products with ChangeNotifier {
   }
 
   Future<void> changeStock(String id) async {
-    final url = Uri.parse((dotenv.env['API_URL'] as String) + "/product");
+    final url = Uri.parse((dotenv.env['API_URL'] as String) + "/product/stock/"+id);
     
     final index = _items.indexWhere((prod) => prod.id == id);
 
     final stock = (_items[index].stock as int) - 1;
 
-    await http.patch(url,
-      body: json.encode({
+    final response = await http.patch(url,
+      headers: <String, String>{
+        "Content-Type": "application/json"
+      },
+      body :jsonEncode(<String, dynamic>{
         'stock' : stock
       })
     );
+
+    print(response.body);
 
     _items[index] = ProductItem(
       id: id, 
@@ -136,10 +141,10 @@ class Products with ChangeNotifier {
     final url = Uri.parse((dotenv.env['API_URL'] as String) + "/product/" + (product.id as String));
 
     await http.put(url,
-      headers : {
-        "accept" : "application/json"
+      headers: <String, String>{
+        "Content-Type": "application/json"
       },
-      body : json.encode({
+      body :jsonEncode(<String, dynamic>{
         "title" : product.title,
         "stock" : product.stock,
         "price" : product.price,

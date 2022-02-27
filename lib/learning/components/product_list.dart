@@ -55,8 +55,9 @@ class ProductList extends StatelessWidget {
             ],
           )
         ).then((result) {
+          print(result);
           if(result){        
-              if((stock as int) > 0){
+              if((stock as int) > 0){                
                 Provider.of<Products>(context,listen: false).changeStock(id as String);
               }else{
                 Scaffold.of(context).hideCurrentSnackBar();
